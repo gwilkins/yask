@@ -116,12 +116,12 @@ extern "C" {
 
 // number of var grids to be calculated.
 #ifndef NUM_VARS
-#define NUM_VARS (1)
+#define NUM_VARS (10)
 #endif
 
 // number of work grids.
 #ifndef NUM_WORKS
-#define NUM_WORKS (1)
+#define NUM_WORKS (10)
 #endif
 
 // total grids.
