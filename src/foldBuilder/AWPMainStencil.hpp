@@ -25,6 +25,8 @@ namespace odc {
     }
 }
 
+typedef float real;
+
 /**
  Stencil class for the main computational domain. Applies fourth-order staggered
  grid in space and time to calculate velocity and stress
@@ -37,31 +39,29 @@ private:
      enum tracks which grid the respective indices refer to.
      */
     
-    GridValue _dt;
-    GridValue _dh;
-    Grid3d _density;
-    
+    real _dt;
+    real _dh;
     
 public:
     
     enum GridVar {
-        kVelocityX = 0;
-        kVelocityY;
-        kVelocityZ;
-        kStressXX;
-        kStressYY;
-        kStressZZ;
-        kStressXY;
-        kStressXZ;
-        kStressYZ;
-        kDensity;
+        kVelocityX = 0,
+        kVelocityY,
+        kVelocityZ,
+        kStressXX,
+        kStressYY,
+        kStressZZ,
+        kStressXY,
+        kStressXZ,
+        kStressYZ,
+        kDensity
         
     };
     
     /**
      Constructor
      */
-    MainStencil(int order=4, dt, dh) : StencilBase(order), _dt(dt), _dh(dh)
+    MainStencil(real dt=0.1, real dh=0.1, int order=4) : StencilBase(order), _dt(dt), _dh(dh)
     {
         // Do nothing
     }
@@ -75,24 +75,19 @@ public:
             return u(t0, v0, i, j, k);
         }
         
-        GridValue
-        
         int tm1 = tW-1;
         GridValue v = value(u, tm1, t0, v0, i, j, k);
-        GridValue c1 = 9.0/8.0;
-        GridValue c2 = -1.0/24.0;
-        
+        real c1 = 9.0/8.0;
+        real c2 = -1.0/24.0;
         
         switch (v0) {
-            case kVelocityX:
+            case kVelocityX: {
+                GridValue densityX = 0.25*(u(t0, kDensity, i, j, k) +
+                u(t0, kDensity, i, j-1, k) +
+                u(t0, kDensity, i, j, k-1) +
+                u(t0, kDensity, i, j-1, k-1));
                 
-                GridValue densityX = u(t0, kDensity, i, j, k) +
-                                        u(t0, kDensity, i, j-1, k) +
-                                        u(t0, kDensity, i, j, k-1) +
-                u(t0, kDensity, i, j-1, k-1);
-                
-                
-                v += _dt/(_dh*densityX)*(c1*(value(u, tm1, t0, kStressXX, i, j, k) - value(u, tm1, t0, kStressXX, i-1, j, k))+
+                v += _dt*(_dh*densityX)*(c1*(value(u, tm1, t0, kStressXX, i, j, k) - value(u, tm1, t0, kStressXX, i-1, j, k))+
                                             c2*(value(u, tm1, t0, kStressXX, i+1, j, k)-value(u, tm1, t0, kStressXX, i-2, j, k)) +
                                             c1*(value(u, tm1, t0, kStressXY, i, j, k) - value(u, tm1, t0, kStressXY, i, j-1, k)) +
                                             c2*(value(u, tm1, t0, kStressXY, i, j+1, k) - value(u, tm1, t0, kStressXY, i, j-2, k)) +
@@ -101,23 +96,58 @@ public:
                 
                 
                 break;
+            }
+            case kVelocityY: {
                 
-            case kVelocityY:
+                velocity_y[pos] += dt/(dh*local_density_y)*(
+                                                            c1*(stress_xy[pos_xp1] - stress_xy[pos]) + c2*(stress_xy[pos_xp2] - stress_xy[pos_xm1]) +
+                                                            c1*(stress_yy[pos_yp1] - stress_yy[pos]) + c2*(stress_yy[pos_yp2] - stress_yy[pos_ym1]) +
+                                                            c1*(stress_yz[pos] - stress_yz[pos_zm1]) + c2*(stress_yz[pos_zp1] - stress_yz[pos_zm2]));
+                
+                GridValue densityY = 0.25*(u(t0, kDensity, i, j, k) +
+                u(t0, kDensity, i+1, j, k) +
+                u(t0, kDensity, i, j, k-1) +
+                u(t0, kDensity, i+1, j-1, k-1));
+                
+                v += _dt*(_dh*densityY)*(c1*(value(u, tm1, t0, kStressXX, i, j, k) - value(u, tm1, t0, kStressXX, i-1, j, k))+
+                                     c2*(value(u, tm1, t0, kStressXX, i+1, j, k)-value(u, tm1, t0, kStressXX, i-2, j, k)) +
+                                     c1*(value(u, tm1, t0, kStressXY, i, j, k) - value(u, tm1, t0, kStressXY, i, j-1, k)) +
+                                     c2*(value(u, tm1, t0, kStressXY, i, j+1, k) - value(u, tm1, t0, kStressXY, i, j-2, k)) +
+                                     c1*(value(u, tm1, t0, kStressXZ, i, j, k) - value(u, tm1, t0, kStressXZ, i, j, k-1)) +
+                                     c2*(value(u, tm1, t0, kStressXZ, i, j, k+1) - value(u, tm1, t0, kStressXZ, i, j, k-2)));
                 
                 break;
+            }
+            case kVelocityZ: {
                 
-            case kVelocityZ:
+                velocity_z[pos] += dt/(dh*local_density_z)*(
+                                                            c1*(stress_xz[pos_xp1] - stress_xz[pos]) + c2*(stress_xz[pos_xp2] - stress_xz[pos_xm1]) +
+                                                            c1*(stress_yz[pos] - stress_yz[pos_ym1]) + c2*(stress_yz[pos_yp1] - stress_yz[pos_ym2]) +
+                                                            c1*(stress_zz[pos_zp1] - stress_zz[pos]) + c2*(stress_zz[pos_zp2] - stress_zz[pos_zm1]));
+                
+                
+                GridValue densityZ = 0.25*(u(t0, kDensity, i, j, k) +
+                u(t0, kDensity, i+1, j, k) +
+                u(t0, kDensity, i, j-1, k) +
+                u(t0, kDensity, i+1, j-1, k-1));
+                
+                v += (_dh*densityZ)*(c1*(value(u, tm1, t0, kStressXX, i, j, k) - value(u, tm1, t0, kStressXX, i-1, j, k))+
+                                     c2*(value(u, tm1, t0, kStressXX, i+1, j, k)-value(u, tm1, t0, kStressXX, i-2, j, k)) +
+                                     c1*(value(u, tm1, t0, kStressXY, i, j, k) - value(u, tm1, t0, kStressXY, i, j-1, k)) +
+                                     c2*(value(u, tm1, t0, kStressXY, i, j+1, k) - value(u, tm1, t0, kStressXY, i, j-2, k)) +
+                                     c1*(value(u, tm1, t0, kStressXZ, i, j, k) - value(u, tm1, t0, kStressXZ, i, j, k-1)) +
+                                     c2*(value(u, tm1, t0, kStressXZ, i, j, k+1) - value(u, tm1, t0, kStressXZ, i, j, k-2)));
                 
                 break;
+            }
                 
-                
-            case kStressXX:
+            case kStressXX: {
                 
                 GridValue test = value(u, tW, t0, kVelocityX, i, j, k);
                 v += test;
                 
                 break;
-                
+            }
             case kStressYY:
                 
                 break;

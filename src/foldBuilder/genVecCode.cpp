@@ -32,6 +32,7 @@ IN THE SOFTWARE.
 #include "ExampleStencil.hpp"
 #include "Iso3dfdStencil.hpp"
 #include "AveStencil.hpp"
+#include "AWPMainStencil.hpp"
 
 // vars set via cmd-line options.
 bool printPseudo = false;
@@ -200,6 +201,8 @@ void parseOpts(int argc, const char* argv[])
     // average-value cube stencil.
     else if (shapeName == "ave") {
         stencilFunc = new AveStencil(order);
+    } else if(shapeName == "awp") {
+        stencilFunc = new odc::kernels::MainStencil();
     }
 
     // other symmetric stencils.

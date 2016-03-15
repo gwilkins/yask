@@ -1,0 +1,891 @@
+Intel(R) Advisor can now assist with vectorization and show optimization
+  report messages with your source code.
+See "https://software.intel.com/en-us/intel-advisor-xe" for details.
+
+
+    Report from: Interprocedural optimizations [ipo]
+
+  WHOLE PROGRAM (SAFE) [EITHER METHOD]: false
+  WHOLE PROGRAM (SEEN) [TABLE METHOD]: false
+  WHOLE PROGRAM (READ) [OBJECT READER METHOD]: false
+
+INLINING OPTION VALUES:
+  -inline-factor: 100
+  -inline-min-size: 30
+  -inline-max-size: 230
+  -inline-max-total-size: 2000
+  -inline-max-per-routine: 10000
+  -inline-max-per-compile: 500000
+
+In the inlining report below:
+   "sz" refers to the "size" of the routine. The smaller a routine's size,
+      the more likely it is to be inlined.
+   "isz" refers to the "inlined size" of the routine. This is the amount
+      the calling routine will grow if the called routine is inlined into it.
+      The compiler generally limits the amount a routine can grow by having
+      routines inlined into it.
+
+Begin optimization report for: calc_steps_ref(StencilContext &, int)
+
+    Report from: Interprocedural optimizations [ipo]
+
+INLINE REPORT: (calc_steps_ref(StencilContext &, int)) [1/18=5.6%] src/stencil_ref.cpp(33,1)
+  -> INLINE (MANUAL): (37,31) Grid5d::getData(Grid5d *) (isz = 1) (sz = 7)
+  -> INLINE (MANUAL): (38,26) RealMatrixBase<11L>::getDimX(const RealMatrixBase<11L> *) const (isz = 2) (sz = 8)
+  -> INLINE (MANUAL): (39,26) RealMatrixBase<11L>::getDimY(const RealMatrixBase<11L> *) const (isz = 2) (sz = 8)
+  -> INLINE (MANUAL): (40,26) RealMatrixBase<11L>::getDimZ(const RealMatrixBase<11L> *) const (isz = 2) (sz = 8)
+  -> EXTERN: (43,5) printf(const char *, ...)
+  -> (61,29) calc_stencil_scalar(StencilContext &, int, int, int, int, int) (isz = 1937) (sz = 1952)
+     [[ Inlining would exceed -inline-max-size value (1952>253) <1>]]
+
+
+    Report from: OpenMP optimizations [openmp]
+
+src/stencil_ref.cpp(49:1-49:1):OMP:__Z14calc_steps_refR14StencilContexti:  OpenMP DEFINED LOOP WAS PARALLELIZED
+
+    Report from: Loop nest, Vector & Auto-parallelization optimizations [loop, vec, par]
+
+
+LOOP BEGIN at src/stencil_ref.cpp(44,5)
+   remark #15521: loop was not vectorized: loop control variable was not identified. Explicitly compute the iteration count before executing the loop or try using canonical loop form
+
+   LOOP BEGIN at src/stencil_ref.cpp(47,9)
+      remark #15521: loop was not vectorized: loop control variable was not identified. Explicitly compute the iteration count before executing the loop or try using canonical loop form
+   LOOP END
+LOOP END
+
+LOOP BEGIN at src/stencil_ref.cpp(50,13)
+   remark #25095: Loop Interchange not done due to: User Function Inside Loop Nest
+   remark #25452: Original Order found to be proper, but by a close margin
+   remark #15382: vectorization support: call to function calc_stencil_scalar(StencilContext &, int, int, int, int, int) cannot be vectorized   [ src/stencil_ref.cpp(61,29) ]
+   remark #15344: loop was not vectorized: vector dependence prevents vectorization
+   remark #15346: vector dependence: assumed OUTPUT dependence between call:calc_stencil_scalar(Stencil line 61 and call:calc_stencil_scalar(Stencil line 61
+   remark #15346: vector dependence: assumed OUTPUT dependence between call:calc_stencil_scalar(Stencil line 61 and call:calc_stencil_scalar(Stencil line 61
+
+   LOOP BEGIN at src/stencil_ref.cpp(53,21)
+      remark #15382: vectorization support: call to function calc_stencil_scalar(StencilContext &, int, int, int, int, int) cannot be vectorized   [ src/stencil_ref.cpp(61,29) ]
+      remark #15344: loop was not vectorized: vector dependence prevents vectorization
+      remark #15346: vector dependence: assumed OUTPUT dependence between call:calc_stencil_scalar(Stencil line 61 and call:calc_stencil_scalar(Stencil line 61
+      remark #15346: vector dependence: assumed OUTPUT dependence between call:calc_stencil_scalar(Stencil line 61 and call:calc_stencil_scalar(Stencil line 61
+
+      LOOP BEGIN at src/stencil_ref.cpp(55,25)
+         remark #15382: vectorization support: call to function calc_stencil_scalar(StencilContext &, int, int, int, int, int) cannot be vectorized   [ src/stencil_ref.cpp(61,29) ]
+         remark #15344: loop was not vectorized: vector dependence prevents vectorization
+      LOOP END
+   LOOP END
+LOOP END
+===========================================================================
+
+Begin optimization report for: calc_stencil_scalar(StencilContext &, int, int, int, int, int)
+
+    Report from: Interprocedural optimizations [ipo]
+
+INLINE REPORT: (calc_stencil_scalar(StencilContext &, int, int, int, int, int)) [2/18=11.1%] src/stencil_scalar_code.hpp(7,1)
+  -> INLINE (MANUAL): (11,20) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (13,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (14,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (15,35) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (19,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (20,35) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (24,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (28,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (29,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (30,35) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (34,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (35,35) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (39,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (43,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (44,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (45,35) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (49,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (50,35) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (54,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (58,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (59,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (60,35) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (64,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (65,35) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (69,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (73,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (74,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (75,35) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (79,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (80,35) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (84,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (88,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (89,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (90,35) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (94,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (95,35) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (99,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (103,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (104,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (105,35) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (109,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (110,35) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (114,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+  -> INLINE (MANUAL): (118,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> INLINE (MANUAL): src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+      -> INLINE (MANUAL): src/real_matrix.hpp:(146,26) RealMatrix4321<11L>::getPtr(const RealMatrix4321<11L> *, int, long, long, long, bool) const (isz = 14) (sz = 31)
+      -> INLINE (MANUAL): src/real_matrix.hpp:(155,20) realv::operator()(const realv *, unsigned int, unsigned int, unsigned int) const (isz = 2) (sz = 15)
+  -> INLINE (MANUAL): (119,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> INLINE (MANUAL): src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+      -> INLINE (MANUAL): src/real_matrix.hpp:(146,26) RealMatrix4321<11L>::getPtr(const RealMatrix4321<11L> *, int, long, long, long, bool) const (isz = 14) (sz = 31)
+      -> INLINE (MANUAL): src/real_matrix.hpp:(155,20) realv::operator()(const realv *, unsigned int, unsigned int, unsigned int) const (isz = 2) (sz = 15)
+  -> INLINE (MANUAL): (120,35) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> INLINE (MANUAL): src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+      -> INLINE (MANUAL): src/real_matrix.hpp:(146,26) RealMatrix4321<11L>::getPtr(const RealMatrix4321<11L> *, int, long, long, long, bool) const (isz = 14) (sz = 31)
+      -> INLINE (MANUAL): src/real_matrix.hpp:(155,20) realv::operator()(const realv *, unsigned int, unsigned int, unsigned int) const (isz = 2) (sz = 15)
+  -> INLINE (MANUAL): (124,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> INLINE (MANUAL): src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+      -> INLINE (MANUAL): src/real_matrix.hpp:(146,26) RealMatrix4321<11L>::getPtr(const RealMatrix4321<11L> *, int, long, long, long, bool) const (isz = 14) (sz = 31)
+      -> INLINE (MANUAL): src/real_matrix.hpp:(155,20) realv::operator()(const realv *, unsigned int, unsigned int, unsigned int) const (isz = 2) (sz = 15)
+  -> INLINE (MANUAL): (125,35) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> INLINE (MANUAL): src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+      -> INLINE (MANUAL): src/real_matrix.hpp:(146,26) RealMatrix4321<11L>::getPtr(const RealMatrix4321<11L> *, int, long, long, long, bool) const (isz = 14) (sz = 31)
+      -> INLINE (MANUAL): src/real_matrix.hpp:(155,20) realv::operator()(const realv *, unsigned int, unsigned int, unsigned int) const (isz = 2) (sz = 15)
+  -> INLINE (MANUAL): (129,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> INLINE (MANUAL): src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+      -> INLINE (MANUAL): src/real_matrix.hpp:(146,26) RealMatrix4321<11L>::getPtr(const RealMatrix4321<11L> *, int, long, long, long, bool) const (isz = 14) (sz = 31)
+      -> INLINE (MANUAL): src/real_matrix.hpp:(155,20) realv::operator()(const realv *, unsigned int, unsigned int, unsigned int) const (isz = 2) (sz = 15)
+  -> INLINE (MANUAL): (131,35) Grid3d::readVal(const Grid3d *, long, long, long, int) const (isz = 99) (sz = 114)
+    -> INLINE (MANUAL): src/Grid.hpp:(58,22) RealMatrix4321<1L>::read1(const RealMatrix4321<1L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+      -> INLINE (MANUAL): src/real_matrix.hpp:(146,26) RealMatrix4321<1L>::getPtr(const RealMatrix4321<1L> *, int, long, long, long, bool) const (isz = 14) (sz = 31)
+      -> INLINE (MANUAL): src/real_matrix.hpp:(155,20) realv::operator()(const realv *, unsigned int, unsigned int, unsigned int) const (isz = 2) (sz = 15)
+  -> INLINE (MANUAL): (134,21) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> INLINE (MANUAL): src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+      -> INLINE (MANUAL): src/real_matrix.hpp:(146,26) RealMatrix4321<11L>::getPtr(const RealMatrix4321<11L> *, int, long, long, long, bool) const (isz = 14) (sz = 31)
+      -> INLINE (MANUAL): src/real_matrix.hpp:(155,20) realv::operator()(const realv *, unsigned int, unsigned int, unsigned int) const (isz = 2) (sz = 15)
+  -> INLINE (MANUAL): (135,36) Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(138,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> INLINE (MANUAL): src/Grid.hpp:(139,22) RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const (isz = 94) (sz = 111)
+      -> INLINE (MANUAL): src/real_matrix.hpp:(146,26) RealMatrix4321<11L>::getPtr(const RealMatrix4321<11L> *, int, long, long, long, bool) const (isz = 14) (sz = 31)
+      -> INLINE (MANUAL): src/real_matrix.hpp:(155,20) realv::operator()(const realv *, unsigned int, unsigned int, unsigned int) const (isz = 2) (sz = 15)
+  -> INLINE (MANUAL): (142,17) Grid5d::writeVal(Grid5d *, float, int, int, long, long, long, int) (isz = 102) (sz = 121)
+    -> INLINE (MANUAL): src/Grid.hpp:(144,17) Grid5d::getMatIndex(const Grid5d *, int, int) const (isz = 0) (sz = 9)
+    -> src/Grid.hpp:(145,15) RealMatrix4321<11L>::write1(RealMatrix4321<11L> *, float, int, long, long, long, int) (isz = 95) (sz = 112)
+       [[ Inlining inhibited by overrideable criterion  <2>]]
+
+
+    Report from: Loop nest, Vector & Auto-parallelization optimizations [loop, vec, par]
+
+
+LOOP BEGIN at src/real_matrix.hpp(143,9) inlined into src/stencil_scalar_code.hpp(119,21)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+
+LOOP BEGIN at src/real_matrix.hpp(144,9) inlined into src/stencil_scalar_code.hpp(119,21)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+
+LOOP BEGIN at src/real_matrix.hpp(145,9) inlined into src/stencil_scalar_code.hpp(119,21)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+
+LOOP BEGIN at src/real_matrix.hpp(143,9) inlined into src/stencil_scalar_code.hpp(120,21)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+
+LOOP BEGIN at src/real_matrix.hpp(144,9) inlined into src/stencil_scalar_code.hpp(120,21)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+
+LOOP BEGIN at src/real_matrix.hpp(145,9) inlined into src/stencil_scalar_code.hpp(120,21)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+
+LOOP BEGIN at src/real_matrix.hpp(143,9) inlined into src/stencil_scalar_code.hpp(121,35)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+
+LOOP BEGIN at src/real_matrix.hpp(144,9) inlined into src/stencil_scalar_code.hpp(121,35)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+
+LOOP BEGIN at src/real_matrix.hpp(145,9) inlined into src/stencil_scalar_code.hpp(121,35)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+
+LOOP BEGIN at src/real_matrix.hpp(143,9) inlined into src/stencil_scalar_code.hpp(125,21)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+
+LOOP BEGIN at src/real_matrix.hpp(144,9) inlined into src/stencil_scalar_code.hpp(125,21)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+
+LOOP BEGIN at src/real_matrix.hpp(145,9) inlined into src/stencil_scalar_code.hpp(125,21)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+
+LOOP BEGIN at src/real_matrix.hpp(143,9) inlined into src/stencil_scalar_code.hpp(126,35)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+
+LOOP BEGIN at src/real_matrix.hpp(144,9) inlined into src/stencil_scalar_code.hpp(126,35)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+
+LOOP BEGIN at src/real_matrix.hpp(145,9) inlined into src/stencil_scalar_code.hpp(126,35)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+
+LOOP BEGIN at src/real_matrix.hpp(143,9) inlined into src/stencil_scalar_code.hpp(130,21)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+
+LOOP BEGIN at src/real_matrix.hpp(144,9) inlined into src/stencil_scalar_code.hpp(130,21)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+
+LOOP BEGIN at src/real_matrix.hpp(145,9) inlined into src/stencil_scalar_code.hpp(130,21)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+
+LOOP BEGIN at src/real_matrix.hpp(143,9) inlined into src/stencil_scalar_code.hpp(132,35)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+
+LOOP BEGIN at src/real_matrix.hpp(144,9) inlined into src/stencil_scalar_code.hpp(132,35)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+
+LOOP BEGIN at src/real_matrix.hpp(145,9) inlined into src/stencil_scalar_code.hpp(132,35)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+
+LOOP BEGIN at src/real_matrix.hpp(143,9) inlined into src/stencil_scalar_code.hpp(135,21)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+
+LOOP BEGIN at src/real_matrix.hpp(144,9) inlined into src/stencil_scalar_code.hpp(135,21)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+
+LOOP BEGIN at src/real_matrix.hpp(145,9) inlined into src/stencil_scalar_code.hpp(135,21)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+
+LOOP BEGIN at src/real_matrix.hpp(143,9) inlined into src/stencil_scalar_code.hpp(136,36)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+
+LOOP BEGIN at src/real_matrix.hpp(144,9) inlined into src/stencil_scalar_code.hpp(136,36)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+
+LOOP BEGIN at src/real_matrix.hpp(145,9) inlined into src/stencil_scalar_code.hpp(136,36)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+===========================================================================
+
+Begin optimization report for: RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const
+
+    Report from: Interprocedural optimizations [ipo]
+
+INLINE REPORT: (RealMatrix4321<11L>::read1(const RealMatrix4321<11L> *, int, long, long, long, int) const) [3/18=16.7%] src/real_matrix.hpp(141,70)
+  -> INLINE (MANUAL): (146,26) RealMatrix4321<11L>::getPtr(const RealMatrix4321<11L> *, int, long, long, long, bool) const (isz = 14) (sz = 31)
+  -> INLINE (MANUAL): (155,20) realv::operator()(const realv *, unsigned int, unsigned int, unsigned int) const (isz = 2) (sz = 15)
+
+
+    Report from: Loop nest, Vector & Auto-parallelization optimizations [loop, vec, par]
+
+
+LOOP BEGIN at src/real_matrix.hpp(143,9)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+
+LOOP BEGIN at src/real_matrix.hpp(144,9)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+
+LOOP BEGIN at src/real_matrix.hpp(145,9)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+===========================================================================
+
+Begin optimization report for: RealMatrix4321<11L>::write1(RealMatrix4321<11L> *, float, int, long, long, long, int)
+
+    Report from: Interprocedural optimizations [ipo]
+
+INLINE REPORT: (RealMatrix4321<11L>::write1(RealMatrix4321<11L> *, float, int, long, long, long, int)) [4/18=22.2%] src/real_matrix.hpp(160,75)
+  -> INLINE (MANUAL): (165,20) RealMatrix4321<11L>::getPtr(RealMatrix4321<11L> *, int, long, long, long, bool) (isz = 2) (sz = 19)
+    -> INLINE (MANUAL): (81,63) RealMatrix4321<11L>::getPtr(const RealMatrix4321<11L> *, int, long, long, long, bool) const (isz = 14) (sz = 31)
+  -> INLINE (MANUAL): (174,13) realv::operator()(realv *, unsigned int, unsigned int, unsigned int) (isz = 2) (sz = 15)
+
+
+    Report from: Loop nest, Vector & Auto-parallelization optimizations [loop, vec, par]
+
+
+LOOP BEGIN at src/real_matrix.hpp(162,9)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+
+LOOP BEGIN at src/real_matrix.hpp(163,9)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+
+LOOP BEGIN at src/real_matrix.hpp(164,9)
+   remark #15335: loop was not vectorized: vectorization possible but seems inefficient. Use vector always directive or -vec-threshold0 to override 
+   remark #15305: vectorization support: vector length 2
+   remark #15399: vectorization support: unroll factor set to 4
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15475: --- begin vector loop cost summary ---
+   remark #15476: scalar loop cost: 2 
+   remark #15477: vector loop cost: 1.000 
+   remark #15478: estimated potential speedup: 1.960 
+   remark #15488: --- end vector loop cost summary ---
+   remark #25456: Number of Array Refs Scalar Replaced In Loop: 2
+LOOP END
+===========================================================================
+
+Begin optimization report for: realv::operator()(realv *, unsigned int, unsigned int, unsigned int)
+
+    Report from: Interprocedural optimizations [ipo]
+
+DEAD STATIC FUNCTION: (realv::operator()(realv *, unsigned int, unsigned int, unsigned int)) src/realv.hpp(108,65)
+
+===========================================================================
+
+Begin optimization report for: realv::operator()(const realv *, unsigned int, unsigned int, unsigned int) const
+
+    Report from: Interprocedural optimizations [ipo]
+
+DEAD STATIC FUNCTION: (realv::operator()(const realv *, unsigned int, unsigned int, unsigned int) const) src/realv.hpp(112,77)
+
+===========================================================================
+
+Begin optimization report for: RealMatrix4321<1L>::getPtr(const RealMatrix4321<1L> *, int, long, long, long, bool) const
+
+    Report from: Interprocedural optimizations [ipo]
+
+DEAD STATIC FUNCTION: (RealMatrix4321<1L>::getPtr(const RealMatrix4321<1L> *, int, long, long, long, bool) const) src/real_matrix.hpp(62,100)
+
+===========================================================================
+
+Begin optimization report for: RealMatrix4321<1L>::read1(const RealMatrix4321<1L> *, int, long, long, long, int) const
+
+    Report from: Interprocedural optimizations [ipo]
+
+DEAD STATIC FUNCTION: (RealMatrix4321<1L>::read1(const RealMatrix4321<1L> *, int, long, long, long, int) const) src/real_matrix.hpp(141,70)
+
+===========================================================================
+
+Begin optimization report for: Grid3d::readVal(const Grid3d *, long, long, long, int) const
+
+    Report from: Interprocedural optimizations [ipo]
+
+DEAD STATIC FUNCTION: (Grid3d::readVal(const Grid3d *, long, long, long, int) const) src/Grid.hpp(56,58)
+
+===========================================================================
+
+Begin optimization report for: RealMatrixBase<11L>::getDimX(const RealMatrixBase<11L> *) const
+
+    Report from: Interprocedural optimizations [ipo]
+
+DEAD STATIC FUNCTION: (RealMatrixBase<11L>::getDimX(const RealMatrixBase<11L> *) const) src/mem_wrappers.hpp(190,33)
+
+===========================================================================
+
+Begin optimization report for: RealMatrixBase<11L>::getDimY(const RealMatrixBase<11L> *) const
+
+    Report from: Interprocedural optimizations [ipo]
+
+DEAD STATIC FUNCTION: (RealMatrixBase<11L>::getDimY(const RealMatrixBase<11L> *) const) src/mem_wrappers.hpp(193,33)
+
+===========================================================================
+
+Begin optimization report for: RealMatrixBase<11L>::getDimZ(const RealMatrixBase<11L> *) const
+
+    Report from: Interprocedural optimizations [ipo]
+
+DEAD STATIC FUNCTION: (RealMatrixBase<11L>::getDimZ(const RealMatrixBase<11L> *) const) src/mem_wrappers.hpp(196,33)
+
+===========================================================================
+
+Begin optimization report for: RealMatrix4321<11L>::getPtr(const RealMatrix4321<11L> *, int, long, long, long, bool) const
+
+    Report from: Interprocedural optimizations [ipo]
+
+DEAD STATIC FUNCTION: (RealMatrix4321<11L>::getPtr(const RealMatrix4321<11L> *, int, long, long, long, bool) const) src/real_matrix.hpp(62,100)
+
+===========================================================================
+
+Begin optimization report for: RealMatrix4321<11L>::getPtr(RealMatrix4321<11L> *, int, long, long, long, bool)
+
+    Report from: Interprocedural optimizations [ipo]
+
+DEAD STATIC FUNCTION: (RealMatrix4321<11L>::getPtr(RealMatrix4321<11L> *, int, long, long, long, bool)) src/real_matrix.hpp(80,88)
+
+===========================================================================
+
+Begin optimization report for: Grid5d::getData(Grid5d *)
+
+    Report from: Interprocedural optimizations [ipo]
+
+DEAD STATIC FUNCTION: (Grid5d::getData(Grid5d *)) src/Grid.hpp(109,28)
+
+===========================================================================
+
+Begin optimization report for: Grid5d::getMatIndex(const Grid5d *, int, int) const
+
+    Report from: Interprocedural optimizations [ipo]
+
+DEAD STATIC FUNCTION: (Grid5d::getMatIndex(const Grid5d *, int, int) const) src/Grid.hpp(115,57)
+
+===========================================================================
+
+Begin optimization report for: Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const
+
+    Report from: Interprocedural optimizations [ipo]
+
+DEAD STATIC FUNCTION: (Grid5d::readVal(const Grid5d *, int, int, long, long, long, int) const) src/Grid.hpp(137,74)
+
+===========================================================================
+
+Begin optimization report for: Grid5d::writeVal(Grid5d *, float, int, int, long, long, long, int)
+
+    Report from: Interprocedural optimizations [ipo]
+
+DEAD STATIC FUNCTION: (Grid5d::writeVal(Grid5d *, float, int, int, long, long, long, int)) src/Grid.hpp(143,81)
+
+===========================================================================
+
+    Report from: Interprocedural optimizations [ipo]
+
+INLINING FOOTNOTES:
+
+<1> The function is larger than the inliner would normally inline.  Use the
+    option -inline-max-size to increase the size of any function that would
+    normally be inlined, add "inline __attribute__((always_inline))" to the
+    declaration of the called function, or add "#pragma forceinline" before
+    the call site.
+
+<2> The compiler's heuristics predict that it is not profitable to inline the
+    call.  Add "inline __attribute__((always_inline))" to the declaration of
+    the called function or add "#pragma forceinline" before the call site.
+
